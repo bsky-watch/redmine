@@ -14,6 +14,7 @@ type uploadResponse struct {
 }
 
 type Upload struct {
+	Id          int    `json:"id"`
 	Token       string `json:"token"`
 	Filename    string `json:"filename"`
 	ContentType string `json:"content_type"`

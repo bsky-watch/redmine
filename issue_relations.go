@@ -3,7 +3,6 @@ package redmine
 import (
 	"encoding/json"
 	"errors"
-	"net/http"
 	"strconv"
 	"strings"
 )
@@ -29,7 +28,11 @@ type IssueRelation struct {
 }
 
 func (c *Client) IssueRelations(issueId int) ([]IssueRelation, error) {
-	res, err := c.Get(c.endpoint + "/issues/" + strconv.Itoa(issueId) + "/relations.json?key=" + c.apikey + c.getPaginationClause())
+	req, err := c.NewRequest("GET", "/issues/"+strconv.Itoa(issueId)+"/relations.json?"+c.getPaginationClause(), nil)
+	if err != nil {
+		return nil, err
+	}
+	res, err := c.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +59,11 @@ func (c *Client) IssueRelations(issueId int) ([]IssueRelation, error) {
 }
 
 func (c *Client) IssueRelation(id int) (*IssueRelation, error) {
-	res, err := c.Get(c.endpoint + "/relations/" + strconv.Itoa(id) + ".json?key=" + c.apikey)
+	req, err := c.NewRequest("GET", "/relations/"+strconv.Itoa(id)+".json", nil)
+	if err != nil {
+		return nil, err
+	}
+	res, err := c.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +96,7 @@ func (c *Client) CreateIssueRelation(issueRelation IssueRelation) (*IssueRelatio
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest("POST", c.endpoint+"/relations.json?key="+c.apikey, strings.NewReader(string(s)))
+	req, err := c.NewRequest("POST", "/relations.json", strings.NewReader(string(s)))
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +131,7 @@ func (c *Client) UpdateIssueRelation(issueRelation IssueRelation) error {
 	if err != nil {
 		return err
 	}
-	req, err := http.NewRequest("PUT", c.endpoint+"/relations/"+strconv.Itoa(issueRelation.Id)+".json?key="+c.apikey, strings.NewReader(string(s)))
+	req, err := c.NewRequest("PUT", "/relations/"+strconv.Itoa(issueRelation.Id)+".json", strings.NewReader(string(s)))
 	if err != nil {
 		return err
 	}
@@ -153,7 +160,7 @@ func (c *Client) UpdateIssueRelation(issueRelation IssueRelation) error {
 }
 
 func (c *Client) DeleteIssueRelation(id int) error {
-	req, err := http.NewRequest("DELETE", c.endpoint+"/relations/"+strconv.Itoa(id)+".json?key="+c.apikey, strings.NewReader(""))
+	req, err := c.NewRequest("DELETE", "/relations/"+strconv.Itoa(id)+".json", strings.NewReader(""))
 	if err != nil {
 		return err
 	}

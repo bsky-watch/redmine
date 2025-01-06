@@ -21,7 +21,11 @@ type News struct {
 }
 
 func (c *Client) News(projectId int) ([]News, error) {
-	res, err := c.Get(c.endpoint + "/projects/" + strconv.Itoa(projectId) + "/news.json?key=" + c.apikey + c.getPaginationClause())
+	req, err := c.NewRequest("GET", "/projects/"+strconv.Itoa(projectId)+"/news.json?"+c.getPaginationClause(), nil)
+	if err != nil {
+		return nil, err
+	}
+	res, err := c.Do(req)
 	if err != nil {
 		return nil, err
 	}

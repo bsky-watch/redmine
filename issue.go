@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
 	"strconv"
 	"strings"
 )
@@ -91,7 +90,7 @@ type CustomField struct {
 }
 
 func (c *Client) IssuesOf(projectId int) ([]Issue, error) {
-	issues, err := getIssues(c, "/issues.json?project_id="+strconv.Itoa(projectId)+"&key="+c.apikey+c.getPaginationClause())
+	issues, err := getIssues(c, "/issues.json?project_id="+strconv.Itoa(projectId)+"&"+c.getPaginationClause())
 
 	if err != nil {
 		return nil, err
@@ -109,7 +108,7 @@ func (c *Client) IssueWithArgs(id int, args map[string]string) (*Issue, error) {
 }
 
 func (c *Client) IssuesByQuery(queryId int) ([]Issue, error) {
-	issues, err := getIssues(c, "/issues.json?query_id="+strconv.Itoa(queryId)+"&key="+c.apikey+c.getPaginationClause())
+	issues, err := getIssues(c, "/issues.json?query_id="+strconv.Itoa(queryId)+"&"+c.getPaginationClause())
 
 	if err != nil {
 		return nil, err
@@ -119,7 +118,7 @@ func (c *Client) IssuesByQuery(queryId int) ([]Issue, error) {
 
 // IssuesByFilter filters issues applying the f criteria
 func (c *Client) IssuesByFilter(f *IssueFilter) ([]Issue, error) {
-	issues, err := getIssues(c, "/issues.json?key="+c.apikey+c.getPaginationClause()+getIssueFilterClause(f))
+	issues, err := getIssues(c, "/issues.json?"+c.getPaginationClause()+getIssueFilterClause(f))
 	if err != nil {
 		return nil, err
 	}
@@ -127,7 +126,7 @@ func (c *Client) IssuesByFilter(f *IssueFilter) ([]Issue, error) {
 }
 
 func (c *Client) Issues() ([]Issue, error) {
-	issues, err := getIssues(c, "/issues.json?key="+c.apikey+c.getPaginationClause())
+	issues, err := getIssues(c, "/issues.json?"+c.getPaginationClause())
 
 	if err != nil {
 		return nil, err
@@ -143,7 +142,7 @@ func (c *Client) CreateIssue(issue Issue) (*Issue, error) {
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest("POST", c.endpoint+"/issues.json?key="+c.apikey, strings.NewReader(string(s)))
+	req, err := c.NewRequest("POST", "/issues.json", strings.NewReader(string(s)))
 	if err != nil {
 		return nil, err
 	}
@@ -178,7 +177,7 @@ func (c *Client) UpdateIssue(issue Issue) error {
 	if err != nil {
 		return err
 	}
-	req, err := http.NewRequest("PUT", c.endpoint+"/issues/"+strconv.Itoa(issue.Id)+".json?key="+c.apikey, strings.NewReader(string(s)))
+	req, err := c.NewRequest("PUT", "/issues/"+strconv.Itoa(issue.Id)+".json", strings.NewReader(string(s)))
 	if err != nil {
 		return err
 	}
@@ -207,7 +206,7 @@ func (c *Client) UpdateIssue(issue Issue) error {
 }
 
 func (c *Client) DeleteIssue(id int) error {
-	req, err := http.NewRequest("DELETE", c.endpoint+"/issues/"+strconv.Itoa(id)+".json?key="+c.apikey, strings.NewReader(""))
+	req, err := c.NewRequest("DELETE", "/issues/"+strconv.Itoa(id)+".json", strings.NewReader(""))
 	if err != nil {
 		return err
 	}
@@ -309,13 +308,17 @@ func mapConcat(m map[string]string, delimiter string) string {
 }
 
 func getOneIssue(c *Client, id int, args map[string]string) (*Issue, error) {
-	url := c.endpoint + "/issues/" + strconv.Itoa(id) + ".json?key=" + c.apikey
+	url := "/issues/" + strconv.Itoa(id) + ".json"
 
 	if args != nil {
-		url += "&" + mapConcat(args, "&")
+		url += mapConcat(args, "&")
 	}
 
-	res, err := c.Get(url)
+	req, err := c.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	res, err := c.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -343,8 +346,12 @@ func getOneIssue(c *Client, id int, args map[string]string) (*Issue, error) {
 }
 
 func getIssue(c *Client, url string, offset int) (*issuesResult, error) {
-	res, err := c.Get(c.endpoint + url + "&offset=" + strconv.Itoa(offset))
+	req, err := c.NewRequest("GET", url+"&offset="+strconv.Itoa(offset), nil)
+	if err != nil {
+		return nil, err
+	}
 
+	res, err := c.Do(req)
 	if err != nil {
 		return nil, err
 	}

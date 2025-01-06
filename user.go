@@ -3,7 +3,6 @@ package redmine
 import (
 	"encoding/json"
 	"errors"
-	"net/http"
 	"strconv"
 	"strings"
 )
@@ -73,7 +72,11 @@ func (uif *UserByIdFilter) Include(include string) {
 }
 
 func (c *Client) Users() ([]User, error) {
-	res, err := c.Get(c.endpoint + "/users.json?key=" + c.apikey + c.getPaginationClause())
+	req, err := c.NewRequest("GET", "/users.json?"+c.getPaginationClause(), nil)
+	if err != nil {
+		return nil, err
+	}
+	res, err := c.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -101,11 +104,10 @@ func (c *Client) UsersWithFilter(filter *UsersFilter) ([]User, error) {
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest("GET", uri, nil)
+	req, err := c.NewRequest("GET", uri, nil)
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Add("X-Redmine-API-Key", c.apikey)
 	res, err := c.Do(req)
 	if err != nil {
 		return nil, err
@@ -130,7 +132,11 @@ func (c *Client) UsersWithFilter(filter *UsersFilter) ([]User, error) {
 }
 
 func (c *Client) User(id int) (*User, error) {
-	res, err := c.Get(c.endpoint + "/users/" + strconv.Itoa(id) + ".json?key=" + c.apikey)
+	req, err := c.NewRequest("GET", "/users/"+strconv.Itoa(id)+".json", nil)
+	if err != nil {
+		return nil, err
+	}
+	res, err := c.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -159,11 +165,10 @@ func (c *Client) UserByIdAndFilter(id int, filter *UserByIdFilter) (*User, error
 		return nil, err
 	}
 
-	req, err := http.NewRequest("GET", uri, nil)
+	req, err := c.NewRequest("GET", uri, nil)
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Add("X-Redmine-API-Key", c.apikey)
 	res, err := c.Do(req)
 	if err != nil {
 		return nil, err

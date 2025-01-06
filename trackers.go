@@ -3,7 +3,6 @@ package redmine
 import (
 	"encoding/json"
 	"errors"
-	"net/http"
 	"strings"
 )
 
@@ -12,7 +11,11 @@ type trackersResult struct {
 }
 
 func (c *Client) Trackers() ([]IdName, error) {
-	res, err := http.Get(c.endpoint + "/trackers.json?key=" + c.apikey + c.getPaginationClause())
+	req, err := c.NewRequest("GET", "/trackers.json?"+c.getPaginationClause(), nil)
+	if err != nil {
+		return nil, err
+	}
+	res, err := c.Do(req)
 	if err != nil {
 		return nil, err
 	}

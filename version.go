@@ -3,7 +3,6 @@ package redmine
 import (
 	"encoding/json"
 	"errors"
-	"net/http"
 	"strconv"
 	"strings"
 )
@@ -33,7 +32,11 @@ type Version struct {
 }
 
 func (c *Client) Version(id int) (*Version, error) {
-	res, err := c.Get(c.endpoint + "/versions/" + strconv.Itoa(id) + ".json?key=" + c.apikey)
+	req, err := c.NewRequest("GET", "/versions/"+strconv.Itoa(id)+".json", nil)
+	if err != nil {
+		return nil, err
+	}
+	res, err := c.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +64,11 @@ func (c *Client) Version(id int) (*Version, error) {
 }
 
 func (c *Client) Versions(projectId int) ([]Version, error) {
-	res, err := c.Get(c.endpoint + "/projects/" + strconv.Itoa(projectId) + "/versions.json?key=" + c.apikey + c.getPaginationClause())
+	req, err := c.NewRequest("GET", "/projects/"+strconv.Itoa(projectId)+"/versions.json?"+c.getPaginationClause(), nil)
+	if err != nil {
+		return nil, err
+	}
+	res, err := c.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +102,7 @@ func (c *Client) CreateVersion(version Version) (*Version, error) {
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest("POST", c.endpoint+"/projects/"+strconv.Itoa(version.Project.Id)+"/versions.json?key="+c.apikey, strings.NewReader(string(s)))
+	req, err := c.NewRequest("POST", "/projects/"+strconv.Itoa(version.Project.Id)+"/versions.json", strings.NewReader(string(s)))
 	if err != nil {
 		return nil, err
 	}
@@ -134,7 +141,7 @@ func (c *Client) UpdateVersion(version Version) error {
 	if err != nil {
 		return err
 	}
-	req, err := http.NewRequest("PUT", c.endpoint+"/versions/"+strconv.Itoa(version.Id)+".json?key="+c.apikey, strings.NewReader(string(s)))
+	req, err := c.NewRequest("PUT", "/versions/"+strconv.Itoa(version.Id)+".json", strings.NewReader(string(s)))
 	if err != nil {
 		return err
 	}
@@ -159,7 +166,7 @@ func (c *Client) UpdateVersion(version Version) error {
 }
 
 func (c *Client) DeleteVersion(id int) error {
-	req, err := http.NewRequest("DELETE", c.endpoint+"/versions/"+strconv.Itoa(id)+".json?key="+c.apikey, strings.NewReader(""))
+	req, err := c.NewRequest("DELETE", "/versions/"+strconv.Itoa(id)+".json", strings.NewReader(""))
 	if err != nil {
 		return err
 	}

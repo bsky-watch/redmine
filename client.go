@@ -7,6 +7,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"path"
 	"strconv"
 	"strings"
 )
@@ -46,14 +47,14 @@ func (c *Client) URLWithFilter(path string, f Filter) (string, error) {
 }
 
 func (c *Client) getPaginationClause() string {
-	clause := ""
+	clauses := []string{}
 	if c.Limit > -1 {
-		clause = clause + fmt.Sprintf("&limit=%v", c.Limit)
+		clauses = append(clauses, fmt.Sprintf("limit=%v", c.Limit))
 	}
 	if c.Offset > -1 {
-		clause = clause + fmt.Sprintf("&offset=%v", c.Offset)
+		clauses = append(clauses, fmt.Sprintf("offset=%v", c.Offset))
 	}
-	return clause
+	return strings.Join(clauses, "&")
 }
 
 type errorsResult struct {
@@ -81,4 +82,21 @@ type IdName struct {
 
 type Id struct {
 	Id int `json:"id"`
+}
+
+func (c *Client) NewRequest(method string, urlPath string, body io.Reader) (*http.Request, error) {
+
+	// Hack to avoid changing how URLWithFilter works.
+	if !strings.HasPrefix("http://", urlPath) && !strings.HasPrefix("https://", urlPath) {
+		urlPath = path.Join(c.endpoint, urlPath)
+	}
+
+	r, err := http.NewRequest(method, urlPath, body)
+	if err != nil {
+		return nil, err
+	}
+	if c.apikey != "" {
+		r.Header.Set("X-Redmine-API-Key", c.apikey)
+	}
+	return r, nil
 }

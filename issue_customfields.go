@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
 	"strings"
 )
 
@@ -14,18 +13,12 @@ type customFieldsResult struct {
 
 // CustomFields consulta los campos personalizados
 func (c *Client) CustomFields() ([]CustomField, error) {
-	req, err := http.NewRequest(
-		"GET",
-		fmt.Sprintf("%s/custom_fields.json?%s",
-			c.endpoint,
-			c.getPaginationClause()),
-		nil)
+	req, err := c.NewRequest("GET", fmt.Sprintf("/custom_fields.json?%s", c.getPaginationClause()), nil)
 	if err != nil {
 		return nil, err
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("X-Redmine-API-Key", c.apikey)
 
 	res, err := c.Do(req)
 	if err != nil {

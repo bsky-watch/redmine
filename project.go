@@ -3,7 +3,6 @@ package redmine
 import (
 	"encoding/json"
 	"errors"
-	"net/http"
 	"strconv"
 	"strings"
 )
@@ -32,7 +31,11 @@ type Project struct {
 }
 
 func (c *Client) Project(id int) (*Project, error) {
-	res, err := c.Get(c.endpoint + "/projects/" + strconv.Itoa(id) + ".json?key=" + c.apikey)
+	req, err := c.NewRequest("GET", "/projects/"+strconv.Itoa(id)+".json", nil)
+	if err != nil {
+		return nil, err
+	}
+	res, err := c.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +59,11 @@ func (c *Client) Project(id int) (*Project, error) {
 }
 
 func (c *Client) Projects() ([]Project, error) {
-	res, err := c.Get(c.endpoint + "/projects.json?key=" + c.apikey + c.getPaginationClause())
+	req, err := c.NewRequest("GET", "/projects.json?"+c.getPaginationClause(), nil)
+	if err != nil {
+		return nil, err
+	}
+	res, err := c.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +93,7 @@ func (c *Client) CreateProject(project Project) (*Project, error) {
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest("POST", c.endpoint+"/projects.json?key="+c.apikey, strings.NewReader(string(s)))
+	req, err := c.NewRequest("POST", "/projects.json", strings.NewReader(string(s)))
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +128,7 @@ func (c *Client) UpdateProject(project Project) error {
 	if err != nil {
 		return err
 	}
-	req, err := http.NewRequest("PUT", c.endpoint+"/projects/"+strconv.Itoa(project.Id)+".json?key="+c.apikey, strings.NewReader(string(s)))
+	req, err := c.NewRequest("PUT", "/projects/"+strconv.Itoa(project.Id)+".json", strings.NewReader(string(s)))
 	if err != nil {
 		return err
 	}
@@ -150,7 +157,7 @@ func (c *Client) UpdateProject(project Project) error {
 }
 
 func (c *Client) DeleteProject(id int) error {
-	req, err := http.NewRequest("DELETE", c.endpoint+"/projects/"+strconv.Itoa(id)+".json?key="+c.apikey, strings.NewReader(""))
+	req, err := c.NewRequest("DELETE", "/projects/"+strconv.Itoa(id)+".json", strings.NewReader(""))
 	if err != nil {
 		return err
 	}

@@ -17,7 +17,11 @@ type IssuePriority struct {
 }
 
 func (c *Client) IssuePriorities() ([]IssuePriority, error) {
-	res, err := c.Get(c.endpoint + "/enumerations/issue_priorities.json?key=" + c.apikey + c.getPaginationClause())
+	req, err := c.NewRequest("GET", "/enumerations/issue_priorities.json?"+c.getPaginationClause(), nil)
+	if err != nil {
+		return nil, err
+	}
+	res, err := c.Do(req)
 	if err != nil {
 		return nil, err
 	}

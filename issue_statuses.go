@@ -18,10 +18,11 @@ type IssueStatus struct {
 }
 
 func (c *Client) IssueStatuses() ([]IssueStatus, error) {
-	res, err := c.Get(c.endpoint + "/issue_statuses.json?key=" + c.apikey + c.getPaginationClause())
+	req, err := c.NewRequest("GET", "/issue_statuses.json?"+c.getPaginationClause(), nil)
 	if err != nil {
 		return nil, err
 	}
+	res, err := c.Do(req)
 	defer res.Body.Close()
 
 	decoder := json.NewDecoder(res.Body)

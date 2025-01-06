@@ -3,7 +3,6 @@ package redmine
 import (
 	"encoding/json"
 	"errors"
-	"net/http"
 	"strconv"
 	"strings"
 )
@@ -29,7 +28,11 @@ type IssueCategory struct {
 }
 
 func (c *Client) IssueCategories(projectId int) ([]IssueCategory, error) {
-	res, err := c.Get(c.endpoint + "/projects/" + strconv.Itoa(projectId) + "/issue_categories.json?key=" + c.apikey + c.getPaginationClause())
+	req, err := c.NewRequest("GET", "/projects/"+strconv.Itoa(projectId)+"/issue_categories.json?"+c.getPaginationClause(), nil)
+	if err != nil {
+		return nil, err
+	}
+	res, err := c.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +59,11 @@ func (c *Client) IssueCategories(projectId int) ([]IssueCategory, error) {
 }
 
 func (c *Client) IssueCategory(id int) (*IssueCategory, error) {
-	res, err := c.Get(c.endpoint + "/issue_categories/" + strconv.Itoa(id) + ".json?key=" + c.apikey)
+	req, err := c.NewRequest("GET", "/issue_categories/"+strconv.Itoa(id)+".json", nil)
+	if err != nil {
+		return nil, err
+	}
+	res, err := c.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +96,7 @@ func (c *Client) CreateIssueCategory(issueCategory IssueCategory) (*IssueCategor
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest("POST", c.endpoint+"/issue_categories.json?key="+c.apikey, strings.NewReader(string(s)))
+	req, err := c.NewRequest("POST", "/issue_categories.json", strings.NewReader(string(s)))
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +131,7 @@ func (c *Client) UpdateIssueCategory(issueCategory IssueCategory) error {
 	if err != nil {
 		return err
 	}
-	req, err := http.NewRequest("PUT", c.endpoint+"/issue_categories/"+strconv.Itoa(issueCategory.Id)+".json?key="+c.apikey, strings.NewReader(string(s)))
+	req, err := c.NewRequest("PUT", "/issue_categories/"+strconv.Itoa(issueCategory.Id)+".json", strings.NewReader(string(s)))
 	if err != nil {
 		return err
 	}
@@ -153,7 +160,7 @@ func (c *Client) UpdateIssueCategory(issueCategory IssueCategory) error {
 }
 
 func (c *Client) DeleteIssueCategory(id int) error {
-	req, err := http.NewRequest("DELETE", c.endpoint+"/issue_categories/"+strconv.Itoa(id)+".json?key="+c.apikey, strings.NewReader(""))
+	req, err := c.NewRequest("DELETE", "/issue_categories/"+strconv.Itoa(id)+".json", strings.NewReader(""))
 	if err != nil {
 		return err
 	}

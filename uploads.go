@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"io/ioutil"
-	"net/http"
 	"strings"
 )
 
@@ -25,7 +24,7 @@ func (c *Client) Upload(filename string) (*Upload, error) {
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest("POST", c.endpoint+"/uploads.json?key="+c.apikey, bytes.NewBuffer(content))
+	req, err := c.NewRequest("POST", "/uploads.json", bytes.NewBuffer(content))
 	if err != nil {
 		return nil, err
 	}

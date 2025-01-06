@@ -3,7 +3,6 @@ package redmine
 import (
 	"encoding/json"
 	"errors"
-	"net/http"
 	"strconv"
 	"strings"
 )
@@ -40,11 +39,10 @@ func (c *Client) TimeEntriesWithFilter(filter Filter) ([]TimeEntry, error) {
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest("GET", uri, nil)
+	req, err := c.NewRequest("GET", uri, nil)
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Add("X-Redmine-API-Key", c.apikey)
 	res, err := c.Do(req)
 	if err != nil {
 		return nil, err
@@ -72,7 +70,11 @@ func (c *Client) TimeEntriesWithFilter(filter Filter) ([]TimeEntry, error) {
 }
 
 func (c *Client) TimeEntries(projectId int) ([]TimeEntry, error) {
-	res, err := c.Get(c.endpoint + "/projects/" + strconv.Itoa(projectId) + "/time_entries.json?key=" + c.apikey + c.getPaginationClause())
+	req, err := c.NewRequest("GET", "/projects/"+strconv.Itoa(projectId)+"/time_entries.json"+c.getPaginationClause(), nil)
+	if err != nil {
+		return nil, err
+	}
+	res, err := c.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +101,11 @@ func (c *Client) TimeEntries(projectId int) ([]TimeEntry, error) {
 }
 
 func (c *Client) TimeEntry(id int) (*TimeEntry, error) {
-	res, err := c.Get(c.endpoint + "/time_entries/" + strconv.Itoa(id) + ".json?key=" + c.apikey)
+	req, err := c.NewRequest("GET", "/time_entries/"+strconv.Itoa(id)+".json", nil)
+	if err != nil {
+		return nil, err
+	}
+	res, err := c.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +138,7 @@ func (c *Client) CreateTimeEntry(timeEntry TimeEntry) (*TimeEntry, error) {
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest("POST", c.endpoint+"/time_entries.json?key="+c.apikey, strings.NewReader(string(s)))
+	req, err := c.NewRequest("POST", "/time_entries.json", strings.NewReader(string(s)))
 	if err != nil {
 		return nil, err
 	}
@@ -167,7 +173,7 @@ func (c *Client) UpdateTimeEntry(timeEntry TimeEntry) error {
 	if err != nil {
 		return err
 	}
-	req, err := http.NewRequest("PUT", c.endpoint+"/time_entries/"+strconv.Itoa(timeEntry.Id)+".json?key="+c.apikey, strings.NewReader(string(s)))
+	req, err := c.NewRequest("PUT", "/time_entries/"+strconv.Itoa(timeEntry.Id)+".json", strings.NewReader(string(s)))
 	if err != nil {
 		return err
 	}
@@ -196,7 +202,7 @@ func (c *Client) UpdateTimeEntry(timeEntry TimeEntry) error {
 }
 
 func (c *Client) DeleteTimeEntry(id int) error {
-	req, err := http.NewRequest("DELETE", c.endpoint+"/time_entries/"+strconv.Itoa(id)+".json?key="+c.apikey, strings.NewReader(""))
+	req, err := c.NewRequest("DELETE", "/time_entries/"+strconv.Itoa(id)+".json", strings.NewReader(""))
 	if err != nil {
 		return err
 	}

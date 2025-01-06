@@ -3,7 +3,6 @@ package redmine
 import (
 	"encoding/json"
 	"errors"
-	"net/http"
 	"strconv"
 	"strings"
 )
@@ -39,7 +38,11 @@ type Parent struct {
 // WikiPages fetches a list of all wiki pages of the given project.
 // The Text field of the listed pages is not fetch by this command and is thus empty.
 func (c *Client) WikiPages(projectId int) ([]WikiPage, error) {
-	res, err := c.Get(c.endpoint + "/projects/" + strconv.Itoa(projectId) + "/wiki/index.json?key=" + c.apikey + c.getPaginationClause())
+	req, err := c.NewRequest("GET", "/projects/"+strconv.Itoa(projectId)+"/wiki/index.json?"+c.getPaginationClause(), nil)
+	if err != nil {
+		return nil, err
+	}
+	res, err := c.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +78,11 @@ func (c *Client) WikiPageAtVersion(projectId int, title string, version string) 
 }
 
 func (c *Client) getWikiPage(projectId int, resource string) (*WikiPage, error) {
-	res, err := c.Get(c.endpoint + "/projects/" + strconv.Itoa(projectId) + "/wiki/" + resource + ".json?key=" + c.apikey)
+	req, err := c.NewRequest("GET", "/projects/"+strconv.Itoa(projectId)+"/wiki/"+resource+".json", nil)
+	if err != nil {
+		return nil, err
+	}
+	res, err := c.Do(req)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +115,7 @@ func (c *Client) CreateWikiPage(projectId int, wikiPage WikiPage) (*WikiPage, er
 	if err != nil {
 		return nil, err
 	}
-	req, err := http.NewRequest("PUT", c.endpoint+"/projects/"+strconv.Itoa(projectId)+"/wiki/"+wikiPage.Title+".json?key="+c.apikey, strings.NewReader(string(s)))
+	req, err := c.NewRequest("PUT", "/projects/"+strconv.Itoa(projectId)+"/wiki/"+wikiPage.Title+".json", strings.NewReader(string(s)))
 	if err != nil {
 		return nil, err
 	}
@@ -143,7 +150,7 @@ func (c *Client) UpdateWikiPage(projectId int, wikiPage WikiPage) error {
 	if err != nil {
 		return err
 	}
-	req, err := http.NewRequest("PUT", c.endpoint+"/projects/"+strconv.Itoa(projectId)+"/wiki/"+wikiPage.Title+".json?key="+c.apikey, strings.NewReader(string(s)))
+	req, err := c.NewRequest("PUT", "/projects/"+strconv.Itoa(projectId)+"/wiki/"+wikiPage.Title+".json", strings.NewReader(string(s)))
 	if err != nil {
 		return err
 	}
@@ -170,7 +177,7 @@ func (c *Client) UpdateWikiPage(projectId int, wikiPage WikiPage) error {
 
 // DeleteWikiPage deletes the wiki page given by its title irreversibly.
 func (c *Client) DeleteWikiPage(projectId int, title string) error {
-	req, err := http.NewRequest("DELETE", c.endpoint+"/projects/"+strconv.Itoa(projectId)+"/wiki/"+title+".json?key="+c.apikey, strings.NewReader(""))
+	req, err := c.NewRequest("DELETE", "/projects/"+strconv.Itoa(projectId)+"/wiki/"+title+".json", strings.NewReader(""))
 	if err != nil {
 		return err
 	}

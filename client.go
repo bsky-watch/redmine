@@ -18,13 +18,21 @@ type Client struct {
 	*http.Client
 	Limit  int
 	Offset int
+
+	impersonate string
 }
 
 var DefaultLimit int = -1  // "-1" means "No setting"
 var DefaultOffset int = -1 //"-1" means "No setting"
 
 func NewClient(endpoint, apikey string) *Client {
-	return &Client{endpoint, apikey, http.DefaultClient, DefaultLimit, DefaultOffset}
+	return &Client{
+		endpoint: endpoint,
+		apikey:   apikey,
+		Client:   http.DefaultClient,
+		Limit:    DefaultLimit,
+		Offset:   DefaultOffset,
+	}
 }
 
 // URLWithFilter return string url by concat endpoint, path and filter
@@ -98,5 +106,14 @@ func (c *Client) NewRequest(method string, urlPath string, body io.Reader) (*htt
 	if c.apikey != "" {
 		r.Header.Set("X-Redmine-API-Key", c.apikey)
 	}
+	if c.impersonate != "" {
+		r.Header.Set("X-Redmine-Switch-User", c.impersonate)
+	}
 	return r, nil
+}
+
+func (c *Client) Impersonate(username string) *Client {
+	newClient := *c
+	newClient.impersonate = username
+	return &newClient
 }

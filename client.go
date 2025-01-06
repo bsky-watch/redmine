@@ -7,7 +7,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"path"
 	"strconv"
 	"strings"
 )
@@ -96,7 +95,9 @@ func (c *Client) NewRequest(method string, urlPath string, body io.Reader) (*htt
 
 	// Hack to avoid changing how URLWithFilter works.
 	if !strings.HasPrefix("http://", urlPath) && !strings.HasPrefix("https://", urlPath) {
-		urlPath = path.Join(c.endpoint, urlPath)
+		a := strings.TrimRight(c.endpoint, "/")
+		b := strings.TrimLeft(urlPath, "/")
+		urlPath = a + "/" + b
 	}
 
 	r, err := http.NewRequest(method, urlPath, body)

@@ -29,7 +29,7 @@ type IssueRelation struct {
 }
 
 func (c *Client) IssueRelations(issueId int) ([]IssueRelation, error) {
-	res, err := c.Get(c.endpoint + "/issue/" + strconv.Itoa(issueId) + "/relations.json?key=" + c.apikey + c.getPaginationClause())
+	res, err := c.Get(c.endpoint + "/issues/" + strconv.Itoa(issueId) + "/relations.json?key=" + c.apikey + c.getPaginationClause())
 	if err != nil {
 		return nil, err
 	}

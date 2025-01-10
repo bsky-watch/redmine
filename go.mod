@@ -1,4 +1,4 @@
-module github.com/mattn/go-redmine
+module bsky.watch/redmine
 
 go 1.13
 

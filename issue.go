@@ -45,17 +45,17 @@ type Issue struct {
 	Subject        string         `json:"subject"`
 	Description    string         `json:"description"`
 	ProjectId      int            `json:"project_id"`
-	Project        *IdName        `json:"project"`
+	Project        *IdName        `json:"project,omitempty"`
 	TrackerId      int            `json:"tracker_id"`
-	Tracker        *IdName        `json:"tracker"`
+	Tracker        *IdName        `json:"tracker,omitempty"`
 	ParentId       int            `json:"parent_issue_id,omitempty"`
-	Parent         *Id            `json:"parent"`
+	Parent         *Id            `json:"parent,omitempty"`
 	StatusId       int            `json:"status_id"`
-	Status         *IdName        `json:"status"`
+	Status         *IdName        `json:"status,omitempty"`
 	PriorityId     int            `json:"priority_id,omitempty"`
-	Priority       *IdName        `json:"priority"`
-	Author         *IdName        `json:"author"`
-	FixedVersion   *IdName        `json:"fixed_version"`
+	Priority       *IdName        `json:"priority,omitempty"`
+	Author         *IdName        `json:"author,omitempty"`
+	FixedVersion   *IdName        `json:"fixed_version,omitempty"`
 	AssignedTo     *IdName        `json:"assigned_to"`
 	AssignedToId   int            `json:"assigned_to_id,omitempty"`
 	Category       *IdName        `json:"category"`
@@ -68,10 +68,10 @@ type Issue struct {
 	DueDate        string         `json:"due_date"`
 	ClosedOn       string         `json:"closed_on"`
 	CustomFields   []*CustomField `json:"custom_fields,omitempty"`
-	Uploads        []*Upload      `json:"uploads"`
-	DoneRatio      float32        `json:"done_ratio"`
-	EstimatedHours float32        `json:"estimated_hours"`
-	Journals       []*Journal     `json:"journals"`
+	Uploads        []*Upload      `json:"uploads,omitempty"`
+	DoneRatio      float32        `json:"done_ratio,omitempty"`
+	EstimatedHours float32        `json:"estimated_hours,omitempty"`
+	Journals       []*Journal     `json:"journals,omitempty"`
 }
 
 type IssueFilter struct {

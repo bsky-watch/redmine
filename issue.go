@@ -30,11 +30,14 @@ type JournalDetails struct {
 	NewValue string `json:"new_value"`
 }
 type Journal struct {
-	Id        int              `json:"id"`
-	User      *IdName          `json:"user"`
-	Notes     string           `json:"notes"`
-	CreatedOn string           `json:"created_on"`
-	Details   []JournalDetails `json:"details"`
+	Id           int              `json:"id"`
+	User         *IdName          `json:"user"`
+	Notes        string           `json:"notes"`
+	CreatedOn    string           `json:"created_on"`
+	UpdatedOn    string           `json:"updated_on"`
+	UpdatedBy    *IdName          `json:"updated_by"`
+	PrivateNotes bool             `json:"private_notes"`
+	Details      []JournalDetails `json:"details"`
 }
 
 type Issue struct {

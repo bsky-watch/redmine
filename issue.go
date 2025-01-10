@@ -34,8 +34,8 @@ type Journal struct {
 	User         *IdName          `json:"user"`
 	Notes        string           `json:"notes"`
 	CreatedOn    string           `json:"created_on"`
-	UpdatedOn    string           `json:"updated_on"`
-	UpdatedBy    *IdName          `json:"updated_by"`
+	UpdatedOn    string           `json:"updated_on,omitempty"`
+	UpdatedBy    *IdName          `json:"updated_by,omitempty"`
 	PrivateNotes bool             `json:"private_notes"`
 	Details      []JournalDetails `json:"details"`
 }

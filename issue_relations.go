@@ -23,8 +23,8 @@ type issueRelationRequest struct {
 
 type IssueRelation struct {
 	Id           int    `json:"id"`
-	IssueId      string `json:"issue_id"`
-	IssueToId    string `json:"issue_to_id"`
+	IssueId      int    `json:"issue_id"`
+	IssueToId    int    `json:"issue_to_id"`
 	RelationType string `json:"relation_type"`
 	Delay        string `json:"delay"`
 }

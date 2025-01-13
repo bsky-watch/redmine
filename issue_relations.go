@@ -98,7 +98,7 @@ func (c *Client) CreateIssueRelation(issueRelation IssueRelation) (*IssueRelatio
 	if err != nil {
 		return nil, err
 	}
-	req, err := c.NewRequest("POST", fmt.Sprintf("/issues/%s/relations.json", issueRelation.IssueId), bytes.NewReader(s))
+	req, err := c.NewRequest("POST", fmt.Sprintf("/issues/%d/relations.json", issueRelation.IssueId), bytes.NewReader(s))
 	if err != nil {
 		return nil, err
 	}

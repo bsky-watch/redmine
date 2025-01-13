@@ -1,8 +1,10 @@
 package redmine
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"strconv"
 	"strings"
 )
@@ -96,7 +98,7 @@ func (c *Client) CreateIssueRelation(issueRelation IssueRelation) (*IssueRelatio
 	if err != nil {
 		return nil, err
 	}
-	req, err := c.NewRequest("POST", "/relations.json", strings.NewReader(string(s)))
+	req, err := c.NewRequest("POST", fmt.Sprintf("/issues/%s/relations.json", issueRelation.IssueId), bytes.NewReader(s))
 	if err != nil {
 		return nil, err
 	}

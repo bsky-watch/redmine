@@ -314,7 +314,7 @@ func getOneIssue(c *Client, id int, args map[string]string) (*Issue, error) {
 	url := "/issues/" + strconv.Itoa(id) + ".json"
 
 	if args != nil {
-		url += mapConcat(args, "&")
+		url += "?" + mapConcat(args, "&")
 	}
 
 	req, err := c.NewRequest("GET", url, nil)

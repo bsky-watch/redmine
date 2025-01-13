@@ -18,7 +18,7 @@ type issueRelationResult struct {
 }
 
 type issueRelationRequest struct {
-	IssueRelation IssueRelation `json:"issue_relation"`
+	IssueRelation IssueRelation `json:"relation"`
 }
 
 type IssueRelation struct {
